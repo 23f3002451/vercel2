@@ -22,7 +22,7 @@ class Payload(BaseModel):
 async def analyze(payload:Payload):
     with open('q-vercel-latency.json') as file:
         data=json.load(file)
-    result={}
+    result={'regions':{}}
     for region in payload.regions:
         count=0
         uptimes=[]
@@ -36,7 +36,7 @@ async def analyze(payload:Payload):
             else:
                 continue
         if not latencies:
-            result[region] = {
+            result['regions'][region] = {
                 "avg_latency": 0,
                 "p95_latency": 0,
                 "avg_uptime": 0,
@@ -49,7 +49,7 @@ async def analyze(payload:Payload):
         index = math.ceil(0.95 * len(sorted_latencies)) - 1
         p95_latency = sorted_latencies[index]
         avg_uptime= sum(uptimes)/len(uptimes)
-        result[region]={
+        result['regions'][region]={
         'avg_latency':round(avg_latency,2),
         'p95_latency':round(p95_latency,2),
         'avg_uptime':round(avg_uptime,3),
