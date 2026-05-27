@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+from fastapi.responses import JSONResponse
 import json
 app=FastAPI()
 app.add_middleware(
@@ -53,7 +54,13 @@ async def analyze(payload:Payload):
         'avg_uptime':round(avg_uptime,3),
         'breaches':count
         }
-    return(result)
+        response = JSONResponse(content=result)
+
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+
+    return response
 
 
        
