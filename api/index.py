@@ -12,6 +12,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_credentials=False,
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 class Payload(BaseModel):
     regions: List[str]
