@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import List
 from fastapi.responses import JSONResponse
 import json
+import numpy as np
 app=FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -45,9 +46,7 @@ async def analyze(payload:Payload):
             continue
 
         avg_latency=sum(latencies)/len(latencies)
-        sorted_latencies=sorted(latencies)
-        index = math.ceil(0.95 * len(sorted_latencies)) -1
-        p95_latency = sorted_latencies[index]
+        p95_latency = np.percentile(latencies,95)
         avg_uptime= sum(uptimes)/len(uptimes)
         result['regions'][region]={
         'avg_latency':round(avg_latency,2),
@@ -55,13 +54,13 @@ async def analyze(payload:Payload):
         'avg_uptime':round(avg_uptime,3),
         'breaches':count
         }
-        response = JSONResponse(content=result)
+    #     response = JSONResponse(content=result)
 
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
+    # response.headers["Access-Control-Allow-Origin"] = "*"
+    # response.headers["Access-Control-Allow-Methods"] = "*"
+    # response.headers["Access-Control-Allow-Headers"] = "*"
 
-    return response
+    return result
 
 
        
