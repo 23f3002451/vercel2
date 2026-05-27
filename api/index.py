@@ -1,7 +1,8 @@
 import math
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel,List
+from pydantic import BaseModel
+from typing import List
 import json
 app=FastAPI()
 app.add_middleware(
@@ -14,7 +15,7 @@ app.add_middleware(
 class Payload(BaseModel):
     regions: List[str]
     threshold_ms: int
-with open('/q-vercel-latency.json') as file:
+with open('q-vercel-latency.json') as file:
     data=json.load(file)
 @app.post("/api/latency")
 async def analyze(payload:Payload):
@@ -24,13 +25,22 @@ async def analyze(payload:Payload):
         uptimes=[]
         latencies=[]
         for i in range(len(data)):
-            if(data[i].region==region):
-                uptimes.append(data[i].uptime_pct)
-                latencies.append(data[i].latency_ms)
-            if(data[i].latency_ms>payload.threshold_ms):
-                count+=1
+            if(data[i]["region"]==region):
+                uptimes.append(data[i]["uptime_pct"])
+                latencies.append(data[i]["latency_ms"])
+                if(data[i]["latency_ms"]>payload.threshold_ms):
+                    count+=1
             else:
                 continue
+        if not latencies:
+            result[region] = {
+                "avg_latency": 0,
+                "p95_latency": 0,
+                "avg_uptime": 0,
+                "breaches": 0
+            }
+            continue
+
         avg_latency=sum(latencies)/len(latencies)
         sorted_latencies=sorted(latencies)
         index = math.ceil(0.95 * len(sorted_latencies)) - 1
