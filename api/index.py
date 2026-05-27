@@ -46,7 +46,7 @@ async def analyze(payload:Payload):
 
         avg_latency=sum(latencies)/len(latencies)
         sorted_latencies=sorted(latencies)
-        index = math.ceil(0.95 * len(sorted_latencies)) 
+        index = math.ceil(0.95 * len(sorted_latencies)) -1
         p95_latency = sorted_latencies[index]
         avg_uptime= sum(uptimes)/len(uptimes)
         result['regions'][region]={
