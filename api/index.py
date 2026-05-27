@@ -15,10 +15,11 @@ app.add_middleware(
 class Payload(BaseModel):
     regions: List[str]
     threshold_ms: int
-with open('q-vercel-latency.json') as file:
-    data=json.load(file)
+
 @app.post("/api/latency")
 async def analyze(payload:Payload):
+    with open('q-vercel-latency.json') as file:
+        data=json.load(file)
     result={}
     for region in payload.regions:
         count=0
